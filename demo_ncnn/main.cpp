@@ -24,6 +24,7 @@ int main() {
 //    }
 //
 //    cout<<img.data<<endl;
+
     cv::Mat img2;
     int input_width = 112;
     int input_height = 112;
