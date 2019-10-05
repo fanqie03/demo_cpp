@@ -15,7 +15,9 @@ int main() {
 //    cv::Mat img = cv::imread(img_path);
     int sz[] = {100, 100, 3};
     cv::Mat bigCube(3, sz, CV_8U, cv::Scalar::all(0));
-    cv::Mat img1 = cv::Mat(3, 3, 3);
+    cv::Mat img1 = cv::Mat(112, 112, 3, 1);
+    cv::Mat z = cv::Mat::zeros(112, 112, CV_8U);
+    cv::Mat o = cv::Mat::ones(cv::Size(112, 112), 0);
 //    if (img.data == NULL)
 //    {
 //        cout << "img is NULL" <<endl;
@@ -31,14 +33,14 @@ int main() {
     ncnn::Net net;
     net.load_param("/home/cmf/w_learn/CLionProjects/untitled/model.param");
     net.load_model("/home/cmf/w_learn/CLionProjects/untitled/model.bin");
-//    把opencv的mat转换成ncnn的mat
-    ncnn::Mat input = ncnn::Mat::from_pixels(img2.data, ncnn::Mat::PIXEL_BGR, img2.cols, img2.rows);
-//    ncnn前向计算
+////    把opencv的mat转换成ncnn的mat
+    ncnn::Mat input = ncnn::Mat::from_pixels(o.data, ncnn::Mat::PIXEL_GRAY2BGR, img2.cols, img2.rows);
+////    ncnn前向计算
     ncnn::Extractor extractor = net.create_extractor();
     extractor.input("data", input);
     ncnn::Mat output;
     extractor.extract("fc1", output);
-//    输出预测结果
+////    输出预测结果
     ncnn::Mat out_flatterned = output.reshape(output.w * output.h * output.c);
     std::vector<float> scores;
     scores.resize(out_flatterned.w);
@@ -48,6 +50,10 @@ int main() {
     }
 
     cout<< scores[0] << endl;
+    for(int i = 0; i < scores.size(); i++)
+    {
+        cout << scores[i] << " ";
+    }
     cout<<"done" << endl;
 
 
