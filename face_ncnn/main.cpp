@@ -13,11 +13,35 @@
 #define FACE_DETECT_SIZEH   448
 using namespace std;
 
+cv::Mat ncnn2cv(ncnn::Mat in, bool show= false){
+    cv::Mat out(in.h, in.w, CV_8UC3);
+    in.to_pixels(out.data, ncnn::Mat::PIXEL_BGR);
+    if (show){
+        cv::imshow("ncnn2cv", out);
+        cv::waitKey(0);
+    }
+    return out;
+}
 
 vector<float> detect_single_img(cv::Mat img) {
     ncnn::Mat in = ncnn::Mat::from_pixels(img.data, ncnn::Mat::PIXEL_BGR, img.cols, img.rows);
     vector<FaceInfo> faceinfo = face_detect(in);
-    vector<float> feature = face_exactfeature(in, faceinfo[0]);
+//    vector<float> feature = face_exactfeature(in, faceinfo[0]);
+    vector<float> feature;
+    int st, et, cnt;
+    double costtime;
+    st = clock();
+    ncnn::Mat det = preprocess(in, faceinfo[0]);
+
+//    et = clock();
+//    costtime = et - st;
+////    LOGD("face_exactfeature preprocess cost %fs\n", costtime / CLOCKS_PER_SEC);
+//    st = clock();
+//    vector<float>feature = g_arcFace.getFeature(det);
+//    et = clock();
+//    costtime = et - st;
+
+    ncnn2cv(det, false);
     return feature;
 
 }
