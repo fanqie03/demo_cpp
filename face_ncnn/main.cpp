@@ -13,6 +13,39 @@
 #define FACE_DETECT_SIZEH   448
 using namespace std;
 
+float distance(int p1x, int p1y, int p2x, int p2y) {
+    int dx = p1x-p2x;
+    int dy = p1y - p2y;
+    return sqrt(dx * dx + dy * dy);
+}
+
+double getPos(FaceInfo faceInfo){
+    int *p = faceInfo.landmark;
+
+    int le = p[0], re = p[2], n = p[4], lm=p[6], rm=p[8];
+    double range =abs(le-n)*1.0/abs(re-le);
+
+    float chinDirection = abs(1.0 * (p[1] - p[3]) / (le - re + 1e-8));
+    float noseDistance = abs(n-le) * 1.0 / abs(n-re);
+//    float noseDistance = distance(p[4], p[5], p[0], p[1]) / distance(p[4], p[5], p[2], p[3]);
+//    return range;
+//    return noseDistance;
+
+
+    if(le > n and re < n and n < lm and n > rm) return 1; //扭头
+    if (noseDistance > 1.5 || noseDistance < 0.5) return 2; //侧脸
+    if (chinDirection > 0.3) return 3;//歪头
+
+
+
+//    int ac = abs(p[4] - p[0]);
+//    int bc = abs(p[5] - p[1]);
+//    return bc*1.0/ac * 180 / 3.1415926;
+
+
+    return 0;
+}
+
 cv::Mat ncnn2cv(ncnn::Mat in, bool show= false){
     cv::Mat out(in.h, in.w, CV_8UC3);
     in.to_pixels(out.data, ncnn::Mat::PIXEL_BGR);
@@ -82,10 +115,13 @@ int main(int args, char **argv) {
                           cv::Scalar(0, 255, 0));
             vector<float> feature = face_exactfeature(in, face);
 //            cout << feature[0] << endl;
-            float sim = face_calcSimilar(feature, my_feature);
-            printf("sim is %f\r\n", sim);
-            cv::putText(resize_frame, to_string(sim), cv::Point(face.x[0], face.y[0]), cv::FONT_HERSHEY_SIMPLEX, 1,
-                        cv::Scalar(0, 255, 0));
+//            float sim = face_calcSimilar(feature, my_feature);
+//            printf("sim is %f\r\n", sim);
+            double pos = getPos(face);
+            cv::putText(resize_frame, to_string(pos), cv::Point(face.x[0], face.y[0]), cv::FONT_HERSHEY_SIMPLEX, 1,
+                        cv::Scalar(0, 255, 0),1, 8,false);
+//            cv::putText(resize_frame, to_string(sim), cv::Point(face.x[0], face.y[0]), cv::FONT_HERSHEY_SIMPLEX, 1,
+//                        cv::Scalar(0, 255, 0));
         }
 
 //        show
