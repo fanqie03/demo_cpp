@@ -125,8 +125,9 @@ int main(int args, char **argv) {
             double pos = getPos(face);
             cv::putText(resize_frame, to_string(sim), cv::Point(face.x[0], face.y[0]), cv::FONT_HERSHEY_SIMPLEX, 1,
                         cv::Scalar(0, 255, 0),1, 8,false);
+
+            int *landmark = face.landmark;
             for(int i=0; i < 10; i+=2){
-                int *landmark = face.landmark;
                 cv::circle(resize_frame, cv::Point(landmark[i], landmark[i+1]), 1 , cv::Scalar(0, 255, 0));
             }
 
